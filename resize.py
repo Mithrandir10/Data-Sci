@@ -3,14 +3,15 @@ import sys
 import glob
 import os
 import shutil
-if (len(sys.argv)!=2):
+
+if (len(sys.argv)!=3):
   print("\nInsufficient Arguments")
   sys.exit()
 parent=os.getcwd()
 new="Frames"
 dirpath=os.path.join(parent,new)
 os.mkdir(dirpath)
-newconv="BndWFrames"
+newconv="ConvFrames"
 dirpathconv=os.path.join(parent,newconv)
 os.mkdir(dirpathconv)
 print(dirpathconv)
@@ -27,13 +28,20 @@ while check:
   print(f'Frame number {count}: {check}')
   count += 1
 print("\nPlease Wait!!")
-
 t=0
+try:
+ prc=100-int(sys.argv[2])
+except:
+  print("\n Insufficient Arguments : Resize Value not provided")
+  sys.exit()
 while(t<count):
- img=cv2.imread(f"{dirpath}/frame{t}.jpg",0)
- cv2.imwrite(f"{dirpathconv}/Conv{t}.jpg",img)
+ img=cv2.imread(f"{dirpath}/frame{t}.jpg",cv2.IMREAD_UNCHANGED)
+ hnew=int(img.shape[0]*(prc/100))
+ wnew=int(img.shape[1]*(prc/100))
+ snew=(wnew,hnew)
+ nimg=cv2.resize(img,snew)
+ cv2.imwrite(f"{dirpathconv}/Conv{t}.jpg",nimg)
  t=t+1
-
 
 vimages=[]
 img=glob.glob(f"{dirpathconv}/*.jpg")
@@ -53,7 +61,7 @@ for i in img:
     vimages.append(img1)
 
     
-v_name='vid_Gscale_output'
+v_name='vid_output'
 try:
  vid=cv2.VideoWriter(f'{parent}/{v_name}.mp4',cv2.VideoWriter_fourcc(*'mp4v'),fps,size)
 except:
